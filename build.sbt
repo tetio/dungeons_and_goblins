@@ -11,3 +11,19 @@ libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "3.0.8" % "test",
   "org.pegdown"    %  "pegdown"     % "1.6.0"  % "test"
 )
+
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-encoding", "UTF-8",       // yes, this is 2 args
+  "-feature",
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-unchecked",
+  "-Xfatal-warnings",
+  "-Xlint",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",        // N.B. doesn't work well with the ??? hole
+  "-Ywarn-numeric-widen"
+  //"-Ywarn-value-discard"
+)
