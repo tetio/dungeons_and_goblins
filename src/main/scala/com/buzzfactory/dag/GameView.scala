@@ -3,6 +3,7 @@ package com.buzzfactory.dag
 import com.buzzfactory.dag.GameView.drawString
 import com.googlecode.lanterna.TextColor
 import com.googlecode.lanterna.graphics.TextGraphics
+import com.googlecode.lanterna.input.{KeyType}
 import com.googlecode.lanterna.screen.TerminalScreen
 import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
 
@@ -68,23 +69,39 @@ object GameView {
   }
 
   @tailrec def mainMenuAction(): Unit = {
-    val k = readKey().toString.toUpperCase
-    k match {
+    readKey(true) match {
       case "S" => startGame(GameState())
       case "Q" => end()
+      case "UP" => mainMenuAction()
+      case "DOWN" => mainMenuAction()
+      case "LEFT" => mainMenuAction()
+      case "RIGHT" => mainMenuAction()
       case _ => mainMenuAction()
     }
   }
+
+  @tailrec def update(floor: DungeonFloor, state: GameState): Unit = {
+    renderGame(floor)
+    screen.refresh()
+    Thread.sleep(100)
+    readKey() match {
+      case "S" => update(floor, state)
+      case "Q" => end()
+      case "UP" => update(floor, state)
+      case "DOWN" => update(floor, state)
+      case "LEFT" => update(floor, state)
+      case "RIGHT" => update(floor, state)
+      case _ => update(floor, state)
+    }
+  }
+
 
   def initFloor(floor: Int) = Dungeon.floor0
 
   def startGame(state: GameState): Unit = {
     clearScreen()
     val floor = initFloor(state.dungeonFloor)
-    // TODO
-    renderGame(floor)
-    screen.refresh()
-    // updateGame()
+    update(floor, state)
   }
 
   def renderGame(floor: DungeonFloor): Unit = {
@@ -97,8 +114,23 @@ object GameView {
 
   /////////////////////////////////////////////////////////
   // Input management
-  def readKey(): Character = {
-    terminal.readInput().getCharacter
+  //  def readKey(): Character = {
+  //    terminal.readInput().getCharacter
+  //  }
+
+  def readKey(blocking: Boolean = false): String = {
+    val key = if (blocking) terminal.readInput() else terminal.pollInput()
+    if (key != null)
+      key.getKeyType match {
+        case KeyType.Character => key.getCharacter.toString.toUpperCase
+        case KeyType.ArrowDown => "DOWN"
+        case KeyType.ArrowUp => "UP"
+        case KeyType.ArrowLeft => "LEFT"
+        case KeyType.ArrowRight => "RIGHT"
+        case _ => "UNKNOWN"
+      }
+    else
+      "NONE"
   }
 
   def readLastKey(): Character = {
@@ -138,10 +170,10 @@ object Drawable {
         val y0 = Math.min(ini.y, end.y)
         val y1 = Math.max(ini.y, end.y)
         if (cleanPath) (y0 to y1).foreach(y => {
-            drawString(ini.x, y, " ", TextColor.ANSI.WHITE)
+          drawString(ini.x, y, " ", TextColor.ANSI.WHITE)
         }) else (y0 - 1 to y1 + 1).foreach(y => {
-            drawString(ini.x - 1, y, corridor.material, TextColor.ANSI.WHITE)
-            drawString(ini.x + 1, y, corridor.material, TextColor.ANSI.WHITE)
+          drawString(ini.x - 1, y, corridor.material, TextColor.ANSI.WHITE)
+          drawString(ini.x + 1, y, corridor.material, TextColor.ANSI.WHITE)
         })
       }
       shape match {
