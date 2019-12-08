@@ -12,7 +12,7 @@ case class Node[A](left: Tree[A], right: Tree[A]) extends Tree[A] {
   def fold[B](node: (B, B) => B, leaf: A => B): B = node(left.fold(node, leaf), right.fold(node, leaf))
 }
 
-object Tree {
+object TestTree {
   def test1(): String = {
     val tree: Tree[String] =
       Node(Node(Leaf("To"), Leaf("iterate")),
