@@ -80,19 +80,24 @@ object GameView {
     }
   }
 
-  @tailrec def update(floor: DungeonFloor, state: GameState): Unit = {
-    renderGame(floor)
-    screen.refresh()
-    Thread.sleep(100)
-    readKey() match {
-      case "S" => update(floor, state)
-      case "Q" => end()
-      case "UP" => update(floor, state)
-      case "DOWN" => update(floor, state)
-      case "LEFT" => update(floor, state)
-      case "RIGHT" => update(floor, state)
-      case _ => update(floor, state)
+  def update(floor: DungeonFloor, state: GameState): Unit = {
+
+    @tailrec def _update(state: GameState): Unit = {
+      renderGame(floor)
+      screen.refresh()
+      Thread.sleep(100)
+      readKey() match {
+        case "S" => _update(state)
+        case "Q" => end()
+        case "UP" => _update(state)
+        case "DOWN" => _update(state)
+        case "LEFT" => _update(state)
+        case "RIGHT" => _update(state)
+        case _ => _update(state)
+      }
     }
+
+    _update(state)
   }
 
 
