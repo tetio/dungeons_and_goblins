@@ -1,6 +1,5 @@
 package com.buzzfactory.dag
 
-import com.buzzfactory.dag.GameView.drawString
 import com.googlecode.lanterna.TextColor
 import com.googlecode.lanterna.graphics.TextGraphics
 import com.googlecode.lanterna.input.{KeyType}
@@ -10,7 +9,7 @@ import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
 import scala.annotation.tailrec
 
 object GameView {
-  val terminal: Terminal = new DefaultTerminalFactory().createTerminal()
+  val terminal: Terminal = new DefaultTerminalFactory().createTerminalEmulator()
   val screen = new TerminalScreen(terminal)
   val tg: TextGraphics = screen.newTextGraphics()
   //  screen.setCursorPosition(null)
@@ -64,6 +63,7 @@ object GameView {
   def openMainMenu(): Unit = {
     renderMainMenu()
     drawString(Position(2, 20), "Hello DM!", TextColor.ANSI.RED)
+    drawString(Position(79, 23), "@", new TextColor.RGB(255,255,0))
     screen.refresh()
     mainMenuAction()
   }
@@ -83,16 +83,17 @@ object GameView {
   def update(floor: DungeonFloor, state: GameState): Unit = {
 
     @tailrec def _update(state: GameState): Unit = {
+      clearScreen()
       renderGame(floor)
       screen.refresh()
-      Thread.sleep(100)
+      Thread.sleep(25)
       readKey() match {
         case "S" => _update(state)
         case "Q" => end()
-        case "UP" => _update(state)
-        case "DOWN" => _update(state)
-        case "LEFT" => _update(state)
-        case "RIGHT" => _update(state)
+        case "UP" => update(DungeonFloor(floor, 0, -1), state)
+        case "DOWN" => update(DungeonFloor(floor, 0, 1), state)
+        case "LEFT" => update(DungeonFloor(floor, -1, 0), state)
+        case "RIGHT" => update(DungeonFloor(floor, 1, 0), state)
         case _ => _update(state)
       }
     }
@@ -140,60 +141,5 @@ object GameView {
 
   def readLastKey(): Character = {
     terminal.pollInput().getCharacter
-  }
-
-}
-
-object Drawable {
-
-  def apply(floor: DungeonFloor): Unit = {
-    drawCorridors(floor.corridors)
-    drawRooms(floor.rooms)
-  }
-
-  def drawRooms(rooms: List[Room]): Unit = {
-    rooms.foreach(room => {
-      room.walls.foreach(wall => drawString(wall.position, wall.material, TextColor.ANSI.WHITE))
-      room.doors.foreach(door => drawString(door.position, door.material, TextColor.ANSI.YELLOW))
-    })
-
-  }
-
-  def drawCorridor(corridor: Corridor, cleanPath: Boolean = false): Unit = {
-
-    @tailrec
-    def draw(ini: Position, end: Position, shape: List[Position]): Unit = {
-      if (ini.x != end.x) (ini.x to end.x).foreach(x => {
-        if (cleanPath) {
-          drawString(x, ini.y, " ", TextColor.ANSI.WHITE)
-        } else {
-          drawString(x, ini.y - 1, corridor.material, TextColor.ANSI.WHITE)
-          drawString(x, ini.y + 1, corridor.material, TextColor.ANSI.WHITE)
-        }
-      })
-      if (ini.y != end.y) {
-        val y0 = Math.min(ini.y, end.y)
-        val y1 = Math.max(ini.y, end.y)
-        if (cleanPath) (y0 to y1).foreach(y => {
-          drawString(ini.x, y, " ", TextColor.ANSI.WHITE)
-        }) else (y0 - 1 to y1 + 1).foreach(y => {
-          drawString(ini.x - 1, y, corridor.material, TextColor.ANSI.WHITE)
-          drawString(ini.x + 1, y, corridor.material, TextColor.ANSI.WHITE)
-        })
-      }
-      shape match {
-        case head :: tail => draw(end, head, tail)
-        case _ => Unit
-      }
-    }
-
-    draw(corridor.position, corridor.shape.head, corridor.shape.tail)
-  }
-
-  def drawCorridors(corridors: List[Corridor]): Unit = {
-    corridors.foreach(corridor => {
-      drawCorridor(corridor)
-      drawCorridor(corridor, true)
-    })
   }
 }
