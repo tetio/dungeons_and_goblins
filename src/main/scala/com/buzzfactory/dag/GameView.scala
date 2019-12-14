@@ -9,7 +9,7 @@ import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
 import scala.annotation.tailrec
 
 object GameView {
-  val terminal: Terminal = new DefaultTerminalFactory().createTerminalEmulator()
+  val terminal: Terminal = new DefaultTerminalFactory().createTerminal()
   val screen = new TerminalScreen(terminal)
   val tg: TextGraphics = screen.newTextGraphics()
   //  screen.setCursorPosition(null)
@@ -86,14 +86,14 @@ object GameView {
       clearScreen()
       renderGame(floor)
       screen.refresh()
-      Thread.sleep(25)
-      readKey() match {
+      //Thread.sleep(50)
+      readKey(true) match {
         case "S" => _update(state)
         case "Q" => end()
-        case "UP" => update(DungeonFloor(floor, 0, -1), state)
-        case "DOWN" => update(DungeonFloor(floor, 0, 1), state)
-        case "LEFT" => update(DungeonFloor(floor, -1, 0), state)
-        case "RIGHT" => update(DungeonFloor(floor, 1, 0), state)
+        case "UP" => update(DungeonFloor(floor, 0, 1), state)
+        case "DOWN" => update(DungeonFloor(floor, 0, -1), state)
+        case "LEFT" => update(DungeonFloor(floor, 1, 0), state)
+        case "RIGHT" => update(DungeonFloor(floor, -1, 0), state)
         case _ => _update(state)
       }
     }
@@ -116,6 +116,9 @@ object GameView {
 
     // Test data
     Drawable(floor)
+
+    // Draw hero
+    drawString(Position(39, 11), "@", new TextColor.RGB(255,255,255))
   }
 
   /////////////////////////////////////////////////////////
