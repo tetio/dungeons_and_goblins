@@ -6,7 +6,8 @@ import com.googlecode.lanterna.TextColor
 import scala.annotation.tailrec
 
 object Drawable {
-  def apply(floor: DungeonFloor): Unit = {
+  def apply(floor: DungeonFloor, viewPos: Position, viewSize: Position): Unit = {
+    val corridors = floor.corridors.filter(c => c.isInside(viewPos, viewSize))
     drawCorridors(floor.corridors)
     drawRooms(floor.rooms)
   }

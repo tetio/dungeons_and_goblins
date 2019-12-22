@@ -20,7 +20,9 @@ case class Room(position: Position, size: Size, walls: List[Wall], doors: List[D
 
 case class Door(position: Position, isOpen: Boolean = false, isSecret: Boolean = false, material: String = "+")
 
-case class Corridor(position: Position, shape: List[Position], material: String = "#") extends DungeonElement
+case class Corridor(position: Position, shape: List[Position], material: String = "#") extends DungeonElement {
+  def isInside(viewPos:Position, viewSize)
+}
 
 case class Trap(position: Position, size: Size, dpr: Int, rounds: Int, material: String = ".") extends DungeonElement
 
@@ -28,10 +30,11 @@ case class DungeonFloor(rooms: List[Room], corridors: List[Corridor], traps: Lis
 
 object DungeonFloor {
   def apply(floor: DungeonFloor, incX: Int, incY: Int): DungeonFloor = {
-    val rooms = floor.rooms.map(r => Room(r, incX, incY))
-    val corridors = floor.corridors.map(c => Corridor(c, incX, incY))
-    // TODO Traps
-    new DungeonFloor(rooms, corridors, floor.traps, floor.material)
+//    val rooms = floor.rooms.map(r => Room(r, incX, incY))
+//    val corridors = floor.corridors.map(c => Corridor(c, incX, incY))
+//    // TODO Traps
+//    new DungeonFloor(rooms, corridors, floor.traps, floor.material)
+    floor
   }
 }
 

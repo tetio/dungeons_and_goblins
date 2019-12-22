@@ -84,16 +84,16 @@ object GameView {
 
     @tailrec def _update(state: GameState): Unit = {
       clearScreen()
-      renderGame(floor, state.hero)
+      renderGame(floor, state.viewPos, state.viewSize)
       screen.refresh()
       //Thread.sleep(50)
       readKey(true) match {
         case "S" => _update(state)
         case "Q" => end()
-        case "UP" => update(DungeonFloor(floor, 0, 1), state.copy(viewPos = state.viewPos.add(0,-1)))
-        case "DOWN" => update(DungeonFloor(floor, 0, -1), state.copy(viewPos = state.viewPos.add(0,1)))
-        case "LEFT" => update(DungeonFloor(floor, 1, 0), state.copy(viewPos = state.viewPos.add(-1,0)))
-        case "RIGHT" => update(DungeonFloor(floor, -1, 0), state.copy(viewPos = state.viewPos.add(1,0)))
+        case "UP" => update(DungeonFloor(floor, 0, 1), GameState(state, Position(0,-1)))
+        case "DOWN" => update(DungeonFloor(floor, 0, -1), GameState(state, Position(0,1)))
+        case "LEFT" => update(DungeonFloor(floor, 1, 0), GameState(state, Position(-1,0)))
+        case "RIGHT" => update(DungeonFloor(floor, -1, 0), GameState(state, Position(1,0)))
         case _ => _update(state)
       }
     }
@@ -110,15 +110,15 @@ object GameView {
     update(floor, state)
   }
 
-  def renderGame(floor: DungeonFloor, hero: Hero): Unit = {
+  def renderGame(floor: DungeonFloor, viewPos: Position, viewSize: Position): Unit = {
     // TODO rooms in visible area
     // TODO rooms in visited area
 
     // Test data
-    Drawable(floor)
+    Drawable(floor, viewPos, viewSize)
 
     // Draw hero
-    drawString(hero.pos, "@", new TextColor.RGB(255,255,255))
+    drawString(viewPos.add(39, 11), "@", new TextColor.RGB(255,255,255))
   }
 
   /////////////////////////////////////////////////////////
