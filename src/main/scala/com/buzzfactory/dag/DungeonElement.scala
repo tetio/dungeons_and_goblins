@@ -2,26 +2,45 @@ package com.buzzfactory.dag
 
 case class Position(x: Int, y: Int) {
   def add(incX:Int, incY:Int): Position = Position(this.x+incX, this.y+incY)
+  def add(pos: Position): Position = Position(this.x+pos.x, this.y+pos.y)
 }
 
 case class Size(width: Int, height: Int)
 
-case class Rectangle(position: Position, size: Size)
+case class Rectangle(position: Position, size: Size) {
+  def contains(pos: Position): Boolean = {
+    (pos.x >= position.x && pos.x < position.x + size.width
+      && pos.y >= position.y && pos.y < position.y + size.height)
+  }
+  def move(inc: Position): Rectangle = {
+    this.copy(position = position.add(inc))
+  }
+}
 
 trait DungeonElement {
   def position: Position
 
   def material: String
+
 }
 
 case class Wall(position: Position, material: String = "#") extends DungeonElement
 
-case class Room(position: Position, size: Size, walls: List[Wall], doors: List[Door], material: String = "#") extends DungeonElement
+case class Room(position: Position, size: Size, walls: List[Wall], doors: List[Door], material: String = "#") extends DungeonElement {
+  def isInside(view: Rectangle): Boolean = {
+    (view.contains(position) || view.contains(position.add(size.width, 0))
+      || view.contains(position.add(size.width, size.height)) || view.contains(position.add(0, size.height)))
+  }
+}
 
 case class Door(position: Position, isOpen: Boolean = false, isSecret: Boolean = false, material: String = "+")
 
 case class Corridor(position: Position, shape: List[Position], material: String = "#") extends DungeonElement {
-  def isInside(viewPos:Position, viewSize)
+  def isInside(view: Rectangle): Boolean = {
+    if (view.contains(position))
+      true
+    shape.exists(s => view.contains(s))
+  }
 }
 
 case class Trap(position: Position, size: Size, dpr: Int, rounds: Int, material: String = ".") extends DungeonElement

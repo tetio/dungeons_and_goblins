@@ -84,7 +84,9 @@ object GameView {
 
     @tailrec def _update(state: GameState): Unit = {
       clearScreen()
-      renderGame(floor, state.viewPos, state.viewSize)
+      renderGame(floor, state.view, state.viewOffset)
+      println(s"View position: (${state.view.position.x}, ${state.view.position.y})")
+      println(s"View offset: (${state.viewOffset.x}, ${state.viewOffset.y})")
       screen.refresh()
       //Thread.sleep(50)
       readKey(true) match {
@@ -110,15 +112,15 @@ object GameView {
     update(floor, state)
   }
 
-  def renderGame(floor: DungeonFloor, viewPos: Position, viewSize: Position): Unit = {
+  def renderGame(floor: DungeonFloor, view: Rectangle, viewOffset: Position): Unit = {
     // TODO rooms in visible area
     // TODO rooms in visited area
 
     // Test data
-    Drawable(floor, viewPos, viewSize)
+    Drawable(floor, view, viewOffset)
 
     // Draw hero
-    drawString(viewPos.add(39, 11), "@", new TextColor.RGB(255,255,255))
+    drawString(view.position.add(39, 11), "@", new TextColor.RGB(255,255,255))
   }
 
   /////////////////////////////////////////////////////////
