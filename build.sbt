@@ -2,7 +2,7 @@ name := "dungeons_and_goblins"
 
 version := "0.1"
 
-scalaVersion := "2.12.7"
+scalaVersion := "2.12.12"
 
 
 libraryDependencies ++= List(
